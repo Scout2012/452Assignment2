@@ -31,7 +31,7 @@ bool AES::setKey(const unsigned char* keyArray)
 	for(int i = 1; i < 17; i++){
 		key[i-1] = keyArray[i];
 	}
-	AES_KEY aes_key;
+	AES_KEY* aes_key;
 	if(encrypt){
 		AES_set_encrypt_key(key,sizeof(key),aes_key);
 	}
