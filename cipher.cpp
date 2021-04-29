@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 	unsigned char* cipherText = cipher->encrypt((unsigned char*)"hello world");
 	
 	/* Perform decryption */
-	//cipher->decrypt(cipherText);	
+	cipher->decrypt(cipherText);	
 	
 	return 0;
 }
