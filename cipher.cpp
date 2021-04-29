@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 	
 	
 	/* Create an instance of the DES cipher */	
-	CipherInterface* cipher = NULL; 
+	CipherInterface* cipher = new DES(); 
 		
 	/* Error checks */
 	if(!cipher)
@@ -36,6 +36,7 @@ int main(int argc, char** argv)
 	 * command line.
 	 */
 	cipher->setKey((unsigned char*)"0123456789abcdef");
+	cipher->encrypt((unsigned char*)"hellhell");
 	
 	/* Perform encryption */
 	//string cipherText = cipher->encrypt("hello world");

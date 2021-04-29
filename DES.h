@@ -9,6 +9,9 @@
 #include "CipherInterface.h"
 #include <ctype.h>
 
+#define ENC 1
+#define DEC 0
+
 using namespace std;
 
 /** 
