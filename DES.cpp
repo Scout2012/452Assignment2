@@ -67,10 +67,14 @@ bool DES::setKey(const unsigned char* keyArray)
  */
 unsigned char* DES::encrypt(const unsigned char* plaintext)
 {
-	unsigned char buffer[4];
+	unsigned char buffer[BYTES_PER_CHUNK/2];
+	int padding_needed = strlen((char*) plaintext) % BYTES_PER_CHUNK;
+	
+	// Dynamically create a buffer of the cipher text that accounts for the padding needed
+	unsigned char* cipherText = new unsigned char[strlen((char*) plaintext) + padding_needed];
 
-	// Figure out how much padding we will need based on % 4
-	unsigned char* cipherText = new unsigned char[sizeof(buffer)/sizeof(unsigned char)];
+	// Set the entire buffer to 0
+	memset(cipherText, 0, BYTES_PER_CHUNK);
 
 	//LOGIC:
 
@@ -78,17 +82,20 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 	DES_LONG block[2];
 
 	//2. Use ctol() to convert the first 4 chars into long; store the result in block[0]
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i < BYTES_PER_CHUNK/2; i++)
 		buffer[i] = plaintext[i];
 	
 	block[0] = ctol(buffer);
+
+	// Reset the temp buffer so we can use it to store the bottom 4 chars too
 	*buffer = NULL;
 
 	//3. Use ctol() to convert the second 4 chars into long; store the result in block[1]
-	for(int i = 0; i < 4; i++)
-		buffer[i] = plaintext[i + 4];
+	for(int i = 0; i < BYTES_PER_CHUNK/2; i++)
+		buffer[i] = plaintext[i + (BYTES_PER_CHUNK/2)];
 	
 	block[1] = ctol(buffer);
+
 
 	//4. Perform des_encrypt1 in order to encrypt the block using this->key (see sample codes for details)
 	DES_encrypt1(block, &key, ENC);
@@ -97,10 +104,13 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 	ltoc(block[0], cipherText);
 	
 	//6. Convert the second ciphertext long to 4 characters using ltoc()
-	ltoc(block[1], cipherText + 4);
+	ltoc(block[1], cipherText + (BYTES_PER_CHUNK/2));
 
 	//7. Save the results in the dynamically allocated char array
 	// (e.g. unsigned char* bytes = new unsigned char[8]).	
+	// This step is done above when we call the ltoc function
+	
+	printf("DES Ciphertext: %s\n", cipherText);
 
 	//8. Return the pointer to the dynamically allocated array.
 	return cipherText;

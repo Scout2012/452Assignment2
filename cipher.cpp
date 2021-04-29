@@ -16,8 +16,6 @@ int main(int argc, char** argv)
 	 * misbehave.
 	 */
 	
-	
-	
 	/* Create an instance of the DES cipher */	
 	CipherInterface* cipher = new DES(); 
 		
@@ -36,10 +34,9 @@ int main(int argc, char** argv)
 	 * command line.
 	 */
 	cipher->setKey((unsigned char*)"0123456789abcdef");
-	cipher->encrypt((unsigned char*)"hellhell");
 	
 	/* Perform encryption */
-	//string cipherText = cipher->encrypt("hello world");
+	unsigned char* cipherText = cipher->encrypt((unsigned char*)"hello world");
 	
 	/* Perform decryption */
 	//cipher->decrypt(cipherText);	

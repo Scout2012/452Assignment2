@@ -11,6 +11,8 @@
 
 #define ENC 1
 #define DEC 0
+#define	BYTES_PER_CHUNK 8
+
 
 using namespace std;
 
@@ -90,6 +92,7 @@ class DES: public CipherInterface
 		
 		/* The key structure used by the DES library */
 		DES_key_schedule key;
+
 };
 
 
