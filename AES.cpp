@@ -51,7 +51,7 @@ bool AES::setKey(const unsigned char* keyArray)
  */
 unsigned char* AES::encrypt(const unsigned char* plainText)
 {
-	
+	int padding_needed = 0;
 	//TODO: 1. Dynamically allocate a block to store the ciphertext.
 	unsigned char* cipherText = new unsigned char[strlen((char*) plaintext) + padding_needed];
 	//	2. Use AES_ecb_encrypt(...) to encrypt the text (please see the URL in setKey(...)
