@@ -1,6 +1,9 @@
 #ifndef AES_H
 #define AES_H
 
+#define BYTES_PER_CHUNK 16
+#define KEY_SIZE 128
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <openssl/aes.h>
