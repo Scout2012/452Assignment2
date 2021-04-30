@@ -56,7 +56,7 @@ unsigned char* AES::encrypt(const unsigned char* plainText)
 	unsigned char* cipherText = new unsigned char[strlen((char*) plaintext) + padding_needed];
 	//	2. Use AES_ecb_encrypt(...) to encrypt the text (please see the URL in setKey(...)
 	//	and the aes.cpp example provided.
-	AES_ecb_encrypt(plainText,cipherText, aes_enc, AES_ENCRYPT);
+	AES_ecb_encrypt(plainText,cipherText, &aes_enc, AES_ENCRYPT);
 	// 	3. Return the pointer to the ciphertext
 	return cipherText;	
 }
@@ -68,15 +68,14 @@ unsigned char* AES::encrypt(const unsigned char* plainText)
  */
 unsigned char* AES::decrypt(const unsigned char* cipherText)
 {
-	
-	//TODO: 1. Dynamically allocate a block to store the plaintext.
-	unsigned char* plainText = new unsigned char[strlen((char*) plaintext) + padding_needed];
-	//	2. Use AES_ecb_encrypt(...) to decrypt the text (please see the URL in setKey(...)
-	//	and the aes.cpp example provided.
-	AES_ecb_encrypt(cipherText,plainText, aes_dec, AES_DECRYPT);
-	// 	3. Return the pointer to the plaintext
-		
-	return plainText;
+    
+    //TODO: 1. Dynamically allocate a block to store the plaintext.
+    unsigned char* plainText = new unsigned char[strlen((char*) cipherText)];
+    //    2. Use AES_ecb_encrypt(...) to decrypt the text (please see the URL in setKey(...)
+    //    and the aes.cpp example provided.
+    AES_ecb_encrypt(cipherText, plainText, &(this->dec_key), AES_DECRYPT);
+    //     3. Return the pointer to the plaintext
+    return plainText;
 }
 
 
