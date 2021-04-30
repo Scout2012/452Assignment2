@@ -27,6 +27,7 @@ bool AES::setKey(const unsigned char* keyArray)
 	// and aes.cpp example provided with the assignment.
 	bool encrypt = keyArray[0] == 0 ? true : false;
 	unsigned char* key;
+	key = (char*)malloc(16*sizeof(char));
 	for(int i = 1; i < 17; i++)
 	{
 		key[i-1] = keyArray[i];
@@ -52,11 +53,12 @@ unsigned char* AES::encrypt(const unsigned char* plainText)
 {
 	
 	//TODO: 1. Dynamically allocate a block to store the ciphertext.
+	unsigned char* cipherText = new unsigned char[strlen((char*) plaintext) + padding_needed];
 	//	2. Use AES_ecb_encrypt(...) to encrypt the text (please see the URL in setKey(...)
 	//	and the aes.cpp example provided.
+	AES_ecb_encrypt(plainText,cipherText, aes_enc, AES_ENCRYPT);
 	// 	3. Return the pointer to the ciphertext
-		
-	return NULL;	
+	return cipherText;	
 }
 
 /**
@@ -68,11 +70,13 @@ unsigned char* AES::decrypt(const unsigned char* cipherText)
 {
 	
 	//TODO: 1. Dynamically allocate a block to store the plaintext.
+	unsigned char* plainText = new unsigned char[strlen((char*) plaintext) + padding_needed];
 	//	2. Use AES_ecb_encrypt(...) to decrypt the text (please see the URL in setKey(...)
 	//	and the aes.cpp example provided.
+	AES_ecb_encrypt(cipherText,plainText, aes_dec, AES_DECRYPT);
 	// 	3. Return the pointer to the plaintext
 		
-	return NULL;
+	return plainText;
 }
 
 
