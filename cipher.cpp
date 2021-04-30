@@ -16,10 +16,8 @@ int main(int argc, char** argv)
 	 * misbehave.
 	 */
 	
-	
-	
 	/* Create an instance of the DES cipher */	
-	CipherInterface* cipher = NULL; 
+	CipherInterface* cipher = new DES(); 
 		
 	/* Error checks */
 	if(!cipher)
@@ -38,7 +36,7 @@ int main(int argc, char** argv)
 	cipher->setKey((unsigned char*)"0123456789abcdef");
 	
 	/* Perform encryption */
-	//string cipherText = cipher->encrypt("hello world");
+	unsigned char* cipherText = cipher->encrypt((unsigned char*)"hello world");
 	
 	/* Perform decryption */
 	//cipher->decrypt(cipherText);	
