@@ -25,36 +25,52 @@ struct UserInput
 	int block_size;
 };
 
-void run_encryption(UserInput input)
+void run_encryption(UserInput* input)
 {
-	CipherInterface* cipher = input->cipher->interface;
-	bool encrypt = input -> encrypt;
-	FILE fp = fopen(input->input_file_name, "r");
-	FILE write = fopen(input->output_file_name, "w");
+	FILE* input_fp = fopen(input->input_file_name, "r");
+	FILE* output_fp = fopen(input->output_file_name, "w");
 	unsigned char* buffer = new unsigned char[input->block_size];
 	bool endOfFile = false;
 	int numRead = -1;
 	int size = input->block_size;
-	while(!endOfFile){
-		numRead = fread(buffer, 1, size, fp);
-		if(numRead < size){
+
+	printf("Reading from file \"%s\"\n",input->input_file_name);
+
+	while(!endOfFile)
+	{
+		numRead = fread(buffer, 1, size, input_fp);
+		if(numRead < size)
+		{
 			endOfFile = true;
-			for(int i = numRead; i < size; i++){
+			for(int i = numRead; i < size; i++)
+			{
 				buffer[i] = 0;
 			}
 		}
+
+		if(buffer == nullptr) { printf("Read of file \"%s\" failed.\n", input->input_file_name); break; }
+		bool temp = buffer[0] == '\0';
+		if(buffer[0] == '\0') { printf("File \"%s\" is empty.\n", input->input_file_name); break; }
+
 		unsigned char* text;
-		if(encrypt){
-			text = cipher->encrypt(buffer);
+		if(*(input->encrypt))
+		{
+			printf("Encrypting input chunk...\n");
+			text = input->cipher->interface->encrypt(buffer);
 		}
-		else{
-			text = cipher->decrypt(buffer);
+		else
+		{
+			printf("Decrypting input chunk...\n");
+			text = input->cipher->interface->decrypt(buffer);
 		}
-		fwrite(text, 1, size, write);
+
+		printf("Writing output to file \"%s\"\n",input->output_file_name);
+
+		fwrite(text, 1, size, output_fp);
 	}
-	fclose(fp);
-	fclose(write);
-	if(buffer == nullptr) { printf("Encrypt not implemented for %s.\nExiting program with exit code -1.\n", type); exit(-1); }
+
+	fclose(input_fp);
+	fclose(output_fp);
 }
 
 unsigned char* get_file_contents(unsigned char* filename)
@@ -166,6 +182,24 @@ UserInput* get_user_input(int argc, char** argv)
 	return nullptr;
 }
 
+char* add_aes_encrypt_flag(char* aes_key, bool encrypt)
+{
+	char* marked_aes_key = (char*)malloc(17*sizeof(char));
+	if(encrypt)
+	{
+		marked_aes_key[0] = '0';
+	}
+	else
+	{
+		marked_aes_key[0] = '1';
+	}
+	for(int i = 1; i < 17; i++)
+	{
+		marked_aes_key[i] = aes_key[i-1];
+	}
+	return marked_aes_key;
+}
+
 int main(int argc, char** argv)
 {
 
@@ -182,32 +216,19 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
-	if(typeid(user.cipher).name()=="AES")
+	if(!strcmp("AES", input->cipher->name))
 	{
-		input.block_size = sizeof(char)*AES_BLOCK_BYTE_SIZE;
-		addEncryptionFlag(input.key, user.encrypt);
+		input->block_size = sizeof(char)*AES_BLOCK_BYTE_SIZE;
+		input->key = add_aes_encrypt_flag(input->key, *(input->encrypt));
 	}
-	else{
-		input.block_size = sizeof(char)*DES_BLOCK_BYTE_SIZE;
+	else
+	{
+		input->block_size = sizeof(char)*DES_BLOCK_BYTE_SIZE;
 	}
 	
 	cipher->setKey((unsigned char*) input->key);
 
 	run_encryption(input);
 
-	exit(-1);
-}
-
-void addEncryptionFlag(char *aes_key, bool encrypt){
-	char *marked_aes_key (unsigned char*)malloc(17*sizeof(unsigned char));
-	if(encrypt){
-		marked_aes_key[0] = '00';
-	}
-	else{
-		marked_aes_key[0] = '01';
-	}
-	for(int i = 1; i < 17; i++){
-		marked_aes_key[i] = aes_key[i-1];
-	}
-	aes_key = marked_aes_key;
+	return 0;
 }
