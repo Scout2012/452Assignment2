@@ -62,6 +62,3 @@ unsigned char* AES::decrypt(const unsigned char* cipherText)
 		
 	return NULL;
 }
-
-
-
