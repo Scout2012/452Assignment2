@@ -85,6 +85,3 @@ unsigned char* AES::decrypt(const unsigned char* cipherText)
 	// 	3. Return the pointer to the plaintext
 	return plainText;
 }
-
-
-

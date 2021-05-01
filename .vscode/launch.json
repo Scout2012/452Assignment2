@@ -9,7 +9,13 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/cipher",
-            "args": [],
+            "args": [
+                "AES",
+                "00112233445566778899aabbccddeeff",
+                "ENC",
+                "in.txt",
+                "out.txt"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

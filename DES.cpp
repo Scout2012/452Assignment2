@@ -126,7 +126,54 @@ unsigned char* DES::decrypt(const unsigned char* ciphertext)
 	//LOGIC:
 	// Same logic as encrypt(), except in step 4. decrypt instead of encrypting
 	//
-	return NULL;
+
+	unsigned char buffer[BYTES_PER_CHUNK/2];
+	int padding_needed = strlen((char*) ciphertext) % BYTES_PER_CHUNK;
+	
+	// Dynamically create a buffer of the cipher text that accounts for the padding needed
+	unsigned char* plaintext = new unsigned char[strlen((char*) ciphertext) + padding_needed];
+
+	// Set the entire buffer to 0
+	memset(plaintext, 0, BYTES_PER_CHUNK);
+
+	//LOGIC:
+
+	//1. Declare an array DES_LONG block[2];
+	DES_LONG block[2];
+
+	//2. Use ctol() to convert the first 4 chars into long; store the result in block[0]
+	for(int i = 0; i < BYTES_PER_CHUNK/2; i++)
+		buffer[i] = ciphertext[i];
+	
+	block[0] = ctol(buffer);
+
+	// Reset the temp buffer so we can use it to store the bottom 4 chars too
+	*buffer = NULL;
+
+	//3. Use ctol() to convert the second 4 chars into long; store the result in block[1]
+	for(int i = 0; i < BYTES_PER_CHUNK/2; i++)
+		buffer[i] = ciphertext[i + (BYTES_PER_CHUNK/2)];
+	
+	block[1] = ctol(buffer);
+
+
+	//4. Perform des_encrypt1 in order to encrypt the block using this->key (see sample codes for details)
+	DES_encrypt1(block, &key, DEC);
+
+	//5. Convert the first ciphertext long to 4 characters using ltoc()
+	ltoc(block[0], plaintext);
+	
+	//6. Convert the second ciphertext long to 4 characters using ltoc()
+	ltoc(block[1], plaintext + (BYTES_PER_CHUNK/2));
+
+	//7. Save the results in the dynamically allocated char array
+	// (e.g. unsigned char* bytes = new unsigned char[8]).	
+	// This step is done above when we call the ltoc function
+	
+	printf("DES Plaintext: %s\n", plaintext);
+
+	//8. Return the pointer to the dynamically allocated array.
+	return plaintext;
 }
 
 /**
