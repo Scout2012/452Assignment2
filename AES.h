@@ -9,6 +9,10 @@
 #include "CipherInterface.h"
 #include <ctype.h>
 
+#define AES_128_KEY_BYTE_SIZE 16
+#define AES_192_KEY_BYTE_SIZE 24
+#define AES_256_KEY_BYTE_SIZE 32
+
 using namespace std;
 
 /** 
