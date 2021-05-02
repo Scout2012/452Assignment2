@@ -61,7 +61,7 @@ unsigned char* AES::encrypt(const unsigned char* plainText)
 {
 	int padding_needed = 0;
 	//TODO: 1. Dynamically allocate a block to store the ciphertext.
-	unsigned char* cipherText = new unsigned char[strlen((char*) plainText) + padding_needed];
+	unsigned char* cipherText = new unsigned char[strlen((char*) plainText)];
 	//	2. Use AES_ecb_encrypt(...) to encrypt the text (please see the URL in setKey(...)
 	//	and the aes.cpp example provided.
 	AES_ecb_encrypt(plainText,cipherText, &(this->enc_key), AES_ENCRYPT);
