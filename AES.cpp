@@ -27,7 +27,7 @@ bool AES::setKey(const unsigned char* keyArray)
 	// For documentation, please see https://boringssl.googlesource.com/boringssl/+/2623/include/openssl/aes.h
 	// and aes.cpp example provided with the assignment.
 	bool encrypt = keyArray[0] == '0' ? true : false;
-	unsigned char* key = (unsigned char*)malloc(16*sizeof(unsigned char));
+	unsigned char* key = new unsigned char[16*sizeof(unsigned char)];
 	for(int i = 1; i < 17; i++)
 	{
 		key[i-1] = keyArray[i];
@@ -76,7 +76,6 @@ unsigned char* AES::encrypt(const unsigned char* plainText)
  */
 unsigned char* AES::decrypt(const unsigned char* cipherText)
 {
-	
 	//TODO: 1. Dynamically allocate a block to store the plaintext.
 	unsigned char* plainText = new unsigned char[strlen((char*) cipherText)];
 	//	2. Use AES_ecb_encrypt(...) to decrypt the text (please see the URL in setKey(...)

@@ -15,6 +15,15 @@ struct CipherType
 {
 	CipherInterface* interface;	
 	char* name;
+
+	~CipherType()
+	{
+		if(interface) delete interface;
+		if(name) delete name;
+
+		interface = nullptr;
+		name = nullptr;
+	}
 };
 
 struct UserInput
@@ -25,6 +34,21 @@ struct UserInput
 	char* input_file_name;
 	char* output_file_name;
 	int block_size;
+
+	~UserInput()
+	{
+		if(cipher) delete cipher;
+		if(key) delete key;
+		if(encrypt) delete encrypt;
+		if(input_file_name) delete input_file_name;
+		if(output_file_name) delete output_file_name;
+
+		cipher = nullptr;
+		key = nullptr;
+		encrypt = nullptr;
+		input_file_name = nullptr;
+		output_file_name = nullptr;
+	}
 };
 
 void run_encryption(UserInput* input)
@@ -64,16 +88,12 @@ void run_encryption(UserInput* input)
 		printf("Writing output to file \"%s\"\n",input->output_file_name);
 
 		fwrite(text, 1, size, output_fp);
-		delete [] buffer; 
+		delete[] text;
+		delete[] buffer; 
 	}
 
 	fclose(input_fp);
 	fclose(output_fp);
-}
-
-unsigned char* get_file_contents(unsigned char* filename)
-{
-	return filename;
 }
 
 // Retrieved from https://stackoverflow.com/a/12774387
@@ -182,7 +202,8 @@ UserInput* get_user_input(int argc, char** argv)
 
 char* add_aes_encrypt_flag(char* aes_key, bool encrypt)
 {
-	char* marked_aes_key = (char*)malloc(17*sizeof(char));
+	char* cipherText = new char[17*sizeof(char)];
+
 	if(encrypt)
 	{
 		marked_aes_key[0] = '0';
@@ -227,6 +248,7 @@ int main(int argc, char** argv)
 	cipher->setKey((unsigned char*) input->key);
 
 	run_encryption(input);
+	
 	delete input;
 	return 0;
 }
