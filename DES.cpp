@@ -70,8 +70,7 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 	unsigned char buffer[BYTES_PER_CHUNK/2];
 	int padding_needed = strlen((char*) plaintext) % BYTES_PER_CHUNK;
 	
-	// Dynamically create a buffer of the cipher text that accounts for the padding needed
-	unsigned char* cipherText = new unsigned char[strlen((char*) plaintext) + padding_needed];
+	unsigned char* cipherText = new unsigned char[strlen((char*) plaintext)];
 
 	// Set the entire buffer to 0
 	memset(cipherText, 0, BYTES_PER_CHUNK);
