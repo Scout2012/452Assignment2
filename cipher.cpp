@@ -35,7 +35,8 @@ void run_encryption(UserInput* input)
 	bool endOfFile = false;
 	int numRead = -1;
 	int size = input->block_size;
-
+	bool temp = ftell(input_fp) == 0;
+		if(temp) { printf("File \"%s\" is empty.\n", input->input_file_name); break; }
 	printf("Reading from file \"%s\"\n",input->input_file_name);
 
 	while(!endOfFile)
@@ -49,10 +50,6 @@ void run_encryption(UserInput* input)
 				buffer[i] = 0;
 			}
 		}
-
-		if(buffer == nullptr) { printf("Read of file \"%s\" failed.\n", input->input_file_name); break; }
-		bool temp = buffer[0] == '\0';
-		if(buffer[0] == '\0') { printf("File \"%s\" is empty.\n", input->input_file_name); break; }
 
 		unsigned char* text;
 		if(*(input->encrypt))
