@@ -67,13 +67,13 @@ bool DES::setKey(const unsigned char* keyArray)
  */
 unsigned char* DES::encrypt(const unsigned char* plaintext)
 {
-	unsigned char buffer[BYTES_PER_CHUNK/2];
-	int padding_needed = strlen((char*) plaintext) % BYTES_PER_CHUNK;
+	unsigned char buffer[DES_BYTES_PER_CHUNK/2];
+	int padding_needed = strlen((char*) plaintext) % DES_BYTES_PER_CHUNK;
 	
 	unsigned char* cipherText = new unsigned char[strlen((char*) plaintext)];
 
 	// Set the entire buffer to 0
-	memset(cipherText, 0, BYTES_PER_CHUNK);
+	memset(cipherText, 0, DES_BYTES_PER_CHUNK);
 
 	//LOGIC:
 
@@ -81,17 +81,14 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 	DES_LONG block[2];
 
 	//2. Use ctol() to convert the first 4 chars into long; store the result in block[0]
-	for(int i = 0; i < BYTES_PER_CHUNK/2; i++)
+	for(int i = 0; i < DES_BYTES_PER_CHUNK/2; i++)
 		buffer[i] = plaintext[i];
 	
 	block[0] = ctol(buffer);
 
-	// Reset the temp buffer so we can use it to store the bottom 4 chars too
-	*buffer = NULL;
-
 	//3. Use ctol() to convert the second 4 chars into long; store the result in block[1]
-	for(int i = 0; i < BYTES_PER_CHUNK/2; i++)
-		buffer[i] = plaintext[i + (BYTES_PER_CHUNK/2)];
+	for(int i = 0; i < DES_BYTES_PER_CHUNK/2; i++)
+		buffer[i] = plaintext[i + (DES_BYTES_PER_CHUNK/2)];
 	
 	block[1] = ctol(buffer);
 
@@ -103,7 +100,7 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 	ltoc(block[0], cipherText);
 	
 	//6. Convert the second ciphertext long to 4 characters using ltoc()
-	ltoc(block[1], cipherText + (BYTES_PER_CHUNK/2));
+	ltoc(block[1], cipherText + (DES_BYTES_PER_CHUNK/2));
 
 	//7. Save the results in the dynamically allocated char array
 	// (e.g. unsigned char* bytes = new unsigned char[8]).	
@@ -126,14 +123,14 @@ unsigned char* DES::decrypt(const unsigned char* ciphertext)
 	// Same logic as encrypt(), except in step 4. decrypt instead of encrypting
 	//
 
-	unsigned char buffer[BYTES_PER_CHUNK/2];
-	int padding_needed = strlen((char*) ciphertext) % BYTES_PER_CHUNK;
+	unsigned char buffer[DES_BYTES_PER_CHUNK/2];
+	int padding_needed = strlen((char*) ciphertext) % DES_BYTES_PER_CHUNK;
 	
 	// Dynamically create a buffer of the cipher text that accounts for the padding needed
 	unsigned char* plaintext = new unsigned char[strlen((char*) ciphertext) + padding_needed];
 
 	// Set the entire buffer to 0
-	memset(plaintext, 0, BYTES_PER_CHUNK);
+	memset(plaintext, 0, DES_BYTES_PER_CHUNK);
 
 	//LOGIC:
 
@@ -141,20 +138,16 @@ unsigned char* DES::decrypt(const unsigned char* ciphertext)
 	DES_LONG block[2];
 
 	//2. Use ctol() to convert the first 4 chars into long; store the result in block[0]
-	for(int i = 0; i < BYTES_PER_CHUNK/2; i++)
+	for(int i = 0; i < DES_BYTES_PER_CHUNK/2; i++)
 		buffer[i] = ciphertext[i];
 	
 	block[0] = ctol(buffer);
 
-	// Reset the temp buffer so we can use it to store the bottom 4 chars too
-	*buffer = NULL;
-
 	//3. Use ctol() to convert the second 4 chars into long; store the result in block[1]
-	for(int i = 0; i < BYTES_PER_CHUNK/2; i++)
-		buffer[i] = ciphertext[i + (BYTES_PER_CHUNK/2)];
+	for(int i = 0; i < DES_BYTES_PER_CHUNK/2; i++)
+		buffer[i] = ciphertext[i + (DES_BYTES_PER_CHUNK/2)];
 	
 	block[1] = ctol(buffer);
-
 
 	//4. Perform des_encrypt1 in order to encrypt the block using this->key (see sample codes for details)
 	DES_encrypt1(block, &key, DEC);
@@ -163,7 +156,7 @@ unsigned char* DES::decrypt(const unsigned char* ciphertext)
 	ltoc(block[0], plaintext);
 	
 	//6. Convert the second ciphertext long to 4 characters using ltoc()
-	ltoc(block[1], plaintext + (BYTES_PER_CHUNK/2));
+	ltoc(block[1], plaintext + (DES_BYTES_PER_CHUNK/2));
 
 	//7. Save the results in the dynamically allocated char array
 	// (e.g. unsigned char* bytes = new unsigned char[8]).	

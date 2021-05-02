@@ -104,8 +104,8 @@ CipherType* get_validated_cipher(char* raw_cipher)
 	if(strcmp("aes", raw_cipher) && strcmp("des", raw_cipher)) { printf("Invalid Cipher Type \"%s\". Options are AES or DES.\n", raw_cipher); return nullptr; }
 	
 	CipherType* cipher = new CipherType;
-	if(!strcmp("aes", raw_cipher)) { cipher->name = "AES"; cipher->interface = new AES(); return cipher; }
-	if(!strcmp("des", raw_cipher)) { cipher->name = "DES"; cipher->interface = new DES(); return cipher; }
+	if(!strcmp("aes", raw_cipher)) { cipher->name = raw_cipher; cipher->interface = new AES(); return cipher; }
+	if(!strcmp("des", raw_cipher)) { cipher->name = raw_cipher; cipher->interface = new DES(); return cipher; }
 
 	return nullptr;
 }
@@ -126,7 +126,7 @@ char* get_validated_key(char* raw_key, char* cipher)
 
 		if(!strcmp("DES", cipher))
 			if(strlen(raw_key) == DES_KEY_SIZE) return raw_key;
-		printf("Invalid key size \"%d\" for cipher \"%s\".\n", strlen(raw_key), cipher);
+		printf("Invalid key size \"%ld\" for cipher \"%s\".\n", strlen(raw_key), cipher);
 		return nullptr;
 	}
 
