@@ -11,7 +11,7 @@
 
 #define ENC 1
 #define DEC 0
-#define	BYTES_PER_CHUNK 8
+#define	DES_BYTES_PER_CHUNK 8
 #define DES_KEY_BYTE_SIZE 7
 
 

@@ -7,11 +7,23 @@
 using namespace std;
 
 #define EXPECTED_ARG_COUNT 6
+#define AES_BLOCK_BYTE_SIZE 16
+#define DES_BLOCK_BYTE_SIZE 8 
+#define DES_KEY_SIZE 16
 
 struct CipherType
 {
 	CipherInterface* interface;	
 	char* name;
+
+	~CipherType()
+	{
+		if(interface) delete interface;
+		if(name) delete name;
+
+		interface = nullptr;
+		name = nullptr;
+	}
 };
 
 struct UserInput
@@ -21,18 +33,67 @@ struct UserInput
 	bool* encrypt;
 	char* input_file_name;
 	char* output_file_name;
+	int block_size;
+
+	~UserInput()
+	{
+		if(cipher) delete cipher;
+		if(key) delete key;
+		if(encrypt) delete encrypt;
+		if(input_file_name) delete input_file_name;
+		if(output_file_name) delete output_file_name;
+
+		cipher = nullptr;
+		key = nullptr;
+		encrypt = nullptr;
+		input_file_name = nullptr;
+		output_file_name = nullptr;
+	}
 };
 
-void run_encryption(CipherInterface* cipher, char* type, unsigned char* buffer, unsigned char* plainText)
+void run_encryption(UserInput* input)
 {
-	printf("Encrypting...\n");
-	buffer = cipher->encrypt((unsigned char*) plainText);
-	if(buffer == nullptr) { printf("Encrypt not implemented for %s.\nExiting program with exit code -1.\n", type); exit(-1); }
-}
+	FILE* input_fp = fopen(input->input_file_name, "r");
+	FILE* output_fp = fopen(input->output_file_name, "w");
+	bool endOfFile = false;
+	int numRead = -1;
+	int size = input->block_size;
+	printf("Reading from file \"%s\"\n",input->input_file_name);
 
-unsigned char* get_file_contents(unsigned char* filename)
-{
-	return filename;
+	while(!endOfFile)
+	{
+		unsigned char* buffer = new unsigned char[input->block_size];
+		numRead = fread(buffer, 1, size, input_fp);
+		if(numRead < size)
+		{
+			endOfFile = true;
+			for(int i = numRead; i < size; i++)
+			{
+				buffer[i] = 0;
+			}
+		}
+
+		unsigned char* text;
+		if(*(input->encrypt))
+		{
+			printf("Encrypting input chunk...\n");
+			text = input->cipher->interface->encrypt(buffer);
+		}
+		else
+		{
+			printf("Decrypting input chunk...\n");
+			text = input->cipher->interface->decrypt(buffer);
+		}
+
+		printf("Writing output to file \"%s\"\n",input->output_file_name);
+
+		fwrite(text, 1, size, output_fp);
+		delete[] text;
+		delete[] buffer; 
+	}
+
+	fclose(input_fp);
+	fclose(output_fp);
 }
 
 // Retrieved from https://stackoverflow.com/a/12774387
@@ -63,8 +124,8 @@ CipherType* get_validated_cipher(char* raw_cipher)
 	if(strcmp("aes", raw_cipher) && strcmp("des", raw_cipher)) { printf("Invalid Cipher Type \"%s\". Options are AES or DES.\n", raw_cipher); return nullptr; }
 	
 	CipherType* cipher = new CipherType;
-	if(!strcmp("aes", raw_cipher)) { cipher->name = "AES"; cipher->interface = new AES(); return cipher; }
-	if(!strcmp("des", raw_cipher)) { cipher->name = "DES"; cipher->interface = new DES(); return cipher; }
+	if(!strcmp("aes", raw_cipher)) { cipher->name = raw_cipher; cipher->interface = new AES(); return cipher; }
+	if(!strcmp("des", raw_cipher)) { cipher->name = raw_cipher; cipher->interface = new DES(); return cipher; }
 
 	return nullptr;
 }
@@ -84,8 +145,8 @@ char* get_validated_key(char* raw_key, char* cipher)
 			if(strlen(raw_key) == AES_128_KEY_BYTE_SIZE || strlen(raw_key) == AES_192_KEY_BYTE_SIZE || strlen(raw_key) == AES_256_KEY_BYTE_SIZE) return raw_key;
 
 		if(!strcmp("DES", cipher))
-			if(strlen(raw_key) == DES_KEY_BYTE_SIZE) return raw_key;
-		printf("Invalid key size \"%d\" for cipher \"%s\".\n", strlen(raw_key), cipher);
+			if(strlen(raw_key) == DES_KEY_SIZE) return raw_key;
+		printf("Invalid key size \"%ld\" for cipher \"%s\".\n", strlen(raw_key), cipher);
 		return nullptr;
 	}
 
@@ -139,64 +200,55 @@ UserInput* get_user_input(int argc, char** argv)
 	return nullptr;
 }
 
+char* add_aes_encrypt_flag(char* aes_key, bool encrypt)
+{
+	char* cipherText = new char[17*sizeof(char)];
+
+	if(encrypt)
+	{
+		marked_aes_key[0] = '0';
+	}
+	else
+	{
+		marked_aes_key[0] = '1';
+	}
+	for(int i = 1; i < 17; i++)
+	{
+		marked_aes_key[i] = aes_key[i-1];
+	}
+	return marked_aes_key;
+}
+
 int main(int argc, char** argv)
 {
 
 	UserInput* input = get_user_input(argc, argv);
 	if(input == nullptr) { printf("\nInvalid User Input.\nExiting program with exit code -1.\n"); exit(-1); };
 
-
-	/**
-	 * TODO: Replace the code below	with your code which can SWITCH
-	 * between DES and AES and encrypt files. DO NOT FORGET TO PAD
-	 * THE LAST BLOCK IF NECESSARY.
-	 *
-	 * NOTE: due to the incomplete skeleton, the code may crash or
-	 * misbehave.
-	 */
-	
-	/* Create an instance of the DES cipher */	
 	CipherInterface* cipher = input->cipher->interface; 
-		
-	/* Error checks */
+
+  /* Error checks */
 	if(!cipher)
 	{
 		fprintf(stderr, "ERROR [%s %s %d]: could not allocate memory\n",	
 		__FILE__, __FUNCTION__, __LINE__);
 		exit(-1);
 	}
+
+	if(!strcmp("AES", input->cipher->name))
+	{
+		input->block_size = sizeof(char)*AES_BLOCK_BYTE_SIZE;
+		input->key = add_aes_encrypt_flag(input->key, *(input->encrypt));
+	}
+	else
+	{
+		input->block_size = sizeof(char)*DES_BLOCK_BYTE_SIZE;
+	}
 	
-	/* Set the encryption key
-	 * A valid key comprises 16 hexidecimal
-	 * characters. Below is one example.
-	 * Your program should take input from
-	 * command line.
-	 */
 	cipher->setKey((unsigned char*) input->key);
 
-	// Temp variables intended to be removed later
-	unsigned char* inputText = get_file_contents((unsigned char*) input->input_file_name);
-	unsigned char* cipherText;
-	unsigned char* plainText;
-
-	/* Perform encryption */
-	if(*(input->encrypt))
-	{
-		run_encryption(cipher, input->cipher->name, cipherText, inputText);
-		return 0;
-	}
-
-	run_encryption(cipher, input->cipher->name, cipherText, inputText);
-
-	/* Perform decryption */
-	if(cipherText != nullptr)
-	{
-		printf("Decrypting...\n");
-		plainText = cipher->decrypt(cipherText);
-		if(plainText == nullptr) { printf("Decrypt not implemented for %s\n", input->cipher->name); return 0; }
-	}
-
-	printf("No valid text to decrypt...\n");
+	run_encryption(input);
 	
-	exit(-1);
+	delete input;
+	return 0;
 }

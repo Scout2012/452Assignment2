@@ -1,6 +1,8 @@
 #ifndef AES_H
 #define AES_H
 
+#define KEY_SIZE 128
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <openssl/aes.h>
@@ -52,8 +54,9 @@ class AES: public CipherInterface
 			
 	/* The protected members */
 	protected:
-
 		//TODO: declare the AES key
+		AES_KEY enc_key;
+		AES_KEY dec_key;
 };
 
 
