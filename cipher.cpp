@@ -129,7 +129,7 @@ char* get_validated_key(char* raw_key, char* cipher)
 			if(strlen(raw_key) == AES_128_KEY_BYTE_SIZE || strlen(raw_key) == AES_192_KEY_BYTE_SIZE || strlen(raw_key) == AES_256_KEY_BYTE_SIZE) return raw_key;
 
 		if(!strcmp("DES", cipher))
-			if(strlen(raw_key) == 16) return raw_key;
+			if(strlen(raw_key) == (size_t)16) return raw_key;
 		printf("Invalid key size \"%d\" for cipher \"%s\".\n", strlen(raw_key), cipher);
 		return nullptr;
 	}
