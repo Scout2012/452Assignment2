@@ -9,6 +9,8 @@ using namespace std;
 #define EXPECTED_ARG_COUNT 6
 #define AES_BLOCK_BYTE_SIZE 16
 #define DES_BLOCK_BYTE_SIZE 8 
+#define DES_KEY_SIZE 16
+
 struct CipherType
 {
 	CipherInterface* interface;	
@@ -127,7 +129,7 @@ char* get_validated_key(char* raw_key, char* cipher)
 			if(strlen(raw_key) == AES_128_KEY_BYTE_SIZE || strlen(raw_key) == AES_192_KEY_BYTE_SIZE || strlen(raw_key) == AES_256_KEY_BYTE_SIZE) return raw_key;
 
 		if(!strcmp("DES", cipher))
-			if(strlen(raw_key) == DES_KEY_BYTE_SIZE) return raw_key;
+			if(strlen(raw_key) == DES_KEY_SIZE) return raw_key;
 		printf("Invalid key size \"%d\" for cipher \"%s\".\n", strlen(raw_key), cipher);
 		return nullptr;
 	}
