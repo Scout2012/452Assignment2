@@ -31,7 +31,6 @@ void run_encryption(UserInput* input)
 {
 	FILE* input_fp = fopen(input->input_file_name, "r");
 	FILE* output_fp = fopen(input->output_file_name, "w");
-	unsigned char* buffer = new unsigned char[input->block_size];
 	bool endOfFile = false;
 	int numRead = -1;
 	int size = input->block_size;
@@ -39,6 +38,7 @@ void run_encryption(UserInput* input)
 
 	while(!endOfFile)
 	{
+		unsigned char* buffer = new unsigned char[input->block_size];
 		numRead = fread(buffer, 1, size, input_fp);
 		if(numRead < size)
 		{
@@ -64,6 +64,7 @@ void run_encryption(UserInput* input)
 		printf("Writing output to file \"%s\"\n",input->output_file_name);
 
 		fwrite(text, 1, size, output_fp);
+		delete [] buffer; 
 	}
 
 	fclose(input_fp);
@@ -226,6 +227,6 @@ int main(int argc, char** argv)
 	cipher->setKey((unsigned char*) input->key);
 
 	run_encryption(input);
-
+	delete input;
 	return 0;
 }
