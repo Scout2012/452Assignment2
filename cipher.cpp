@@ -63,7 +63,6 @@ void run_encryption(UserInput* input)
 	int numRead = -1;
 	int size = input->block_size;
 	printf("Reading from file \"%s\"\n",input->input_file_name);
-	if(!file_exists(input->input_file_name)) { printf("File \"%s\" does not exist.\n", input->input_file_name); exit(-1);}
 	while(!endOfFile)
 	{
 		unsigned char* buffer = new unsigned char[input->block_size];
@@ -165,7 +164,7 @@ bool* get_validated_encrypt(char* raw_encrpyt)
 
 char* get_validated_input_fn(char* raw_input_name)
 {
-	// if(raw_input_name == nullptr || !file_exists(raw_input_name)) { printf("Input File Does Not Exist \"%s\"", raw_input_name); return nullptr; }
+	if(raw_input_name == nullptr || !file_exists(raw_input_name)) { printf("Input File Does Not Exist \"%s\"", raw_input_name); return nullptr; }
 	return raw_input_name;
 }
 
