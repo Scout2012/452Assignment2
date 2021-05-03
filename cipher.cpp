@@ -37,7 +37,6 @@ struct UserInput
 	~UserInput()
 	{
 		if(cipher) delete cipher;
-		if(key) delete key;
 		if(encrypt) delete encrypt;
 
 		cipher = nullptr;

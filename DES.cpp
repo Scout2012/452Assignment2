@@ -106,8 +106,6 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 	// (e.g. unsigned char* bytes = new unsigned char[8]).	
 	// This step is done above when we call the ltoc function
 	
-	printf("DES Ciphertext: %s\n", cipherText);
-
 	//8. Return the pointer to the dynamically allocated array.
 	return cipherText;
 }
@@ -162,8 +160,6 @@ unsigned char* DES::decrypt(const unsigned char* ciphertext)
 	// (e.g. unsigned char* bytes = new unsigned char[8]).	
 	// This step is done above when we call the ltoc function
 	
-	printf("DES Plaintext: %s\n", plaintext);
-
 	//8. Return the pointer to the dynamically allocated array.
 	return plaintext;
 }
