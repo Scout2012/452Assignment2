@@ -19,7 +19,6 @@ struct CipherType
 	~CipherType()
 	{
 		if(interface) delete interface;
-		if(name) delete name;
 
 		interface = nullptr;
 		name = nullptr;
@@ -40,8 +39,6 @@ struct UserInput
 		if(cipher) delete cipher;
 		if(key) delete key;
 		if(encrypt) delete encrypt;
-		if(input_file_name) delete input_file_name;
-		if(output_file_name) delete output_file_name;
 
 		cipher = nullptr;
 		key = nullptr;
@@ -51,6 +48,14 @@ struct UserInput
 	}
 };
 
+// Retrieved from https://stackoverflow.com/a/12774387
+bool file_exists (const char* name)
+{
+  struct stat buffer;
+  bool exists = stat(name, &buffer) == 0;
+  return exists;
+}
+
 void run_encryption(UserInput* input)
 {
 	FILE* input_fp = fopen(input->input_file_name, "r");
@@ -59,7 +64,7 @@ void run_encryption(UserInput* input)
 	int numRead = -1;
 	int size = input->block_size;
 	printf("Reading from file \"%s\"\n",input->input_file_name);
-
+	if(!file_exists(input->input_file_name)) { printf("File \"%s\" does not exist.\n", input->input_file_name); exit(-1);}
 	while(!endOfFile)
 	{
 		unsigned char* buffer = new unsigned char[input->block_size];
@@ -94,13 +99,6 @@ void run_encryption(UserInput* input)
 
 	fclose(input_fp);
 	fclose(output_fp);
-}
-
-// Retrieved from https://stackoverflow.com/a/12774387
-bool file_exists (const char* name) {
-  struct stat buffer;
-  bool exists = stat(name, &buffer) == 0;
-  return exists;
 }
 
 // Retrieved from https://stackoverflow.com/a/41149146
@@ -139,18 +137,18 @@ char* get_validated_key(char* raw_key, char* cipher)
 	if(raw_key == nullptr) { printf("Invalid Key \"%s\"", raw_key); return nullptr; }
 	if(cipher == nullptr) { printf("Invalid Cipher \"%s\"", cipher); return nullptr; }
 
-	if(!strcmp("AES", cipher) || !strcmp("DES", cipher))
+	if(!strcmp("aes", cipher) || !strcmp("des", cipher))
 	{
-		if(!strcmp("AES", cipher))
+		if(!strcmp("aes", cipher))
 			if(strlen(raw_key) == AES_128_KEY_BYTE_SIZE || strlen(raw_key) == AES_192_KEY_BYTE_SIZE || strlen(raw_key) == AES_256_KEY_BYTE_SIZE) return raw_key;
 
-		if(!strcmp("DES", cipher))
+		if(!strcmp("des", cipher))
 			if(strlen(raw_key) == DES_KEY_SIZE) return raw_key;
 		printf("Invalid key size \"%ld\" for cipher \"%s\".\n", strlen(raw_key), cipher);
 		return nullptr;
 	}
 
-	printf("Invalid cipher type. Valid options are AES or DES\n");
+	printf("Invalid cipher type \"%s\". Valid options are AES or DES\n", cipher);
 	return nullptr;
 }
 
@@ -162,7 +160,7 @@ bool* get_validated_encrypt(char* raw_encrpyt)
 	if(!strcmp("enc", lower_encrypt)) return new bool(true);
 	if(!strcmp("dec", lower_encrypt)) return new bool(false);
 
-	printf("Options are ENC or DEC \"%s\"", raw_encrpyt);
+	printf("Options are ENC or DEC. You entered \"%s\"", raw_encrpyt);
 	return nullptr;
 }
 
@@ -235,7 +233,7 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
-	if(!strcmp("AES", input->cipher->name))
+	if(!strcmp("aes", input->cipher->name))
 	{
 		input->block_size = sizeof(char)*AES_BLOCK_BYTE_SIZE;
 		input->key = add_aes_encrypt_flag(input->key, *(input->encrypt));
