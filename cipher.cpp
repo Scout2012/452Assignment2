@@ -202,7 +202,7 @@ UserInput* get_user_input(int argc, char** argv)
 
 char* add_aes_encrypt_flag(char* aes_key, bool encrypt)
 {
-	char* cipherText = new char[17*sizeof(char)];
+	char* marked_aes_key = new char[17*sizeof(char)];
 
 	if(encrypt)
 	{
